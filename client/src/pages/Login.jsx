@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import axios from "axios";
 
 function Login() {
   const navigate = useNavigate();
@@ -7,9 +8,16 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (email && password) {
-      alert("Login success (temporary)");
+      const res = await axios.post("http://localhost:5000/api/auth/login", {
+        email,
+        password
+      });
+
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("userId", res.data.userId);
+
       navigate("/dashboard");
     }
   };
