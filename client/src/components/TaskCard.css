@@ -107,14 +107,40 @@
   font-size: 0.75rem;
   color: var(--text-muted);
 }
+.task-meta .overdue {
+  color: #ef4444;
+  font-weight: 600;
+}
 
 .task-actions {
-  opacity: 0;
+  display: flex;
+  gap: 8px;
   transition: var(--transition);
 }
 
-.task-card:hover .task-actions {
-  opacity: 1;
+.action-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  font-size: 0.85rem;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-weight: 600;
+}
+
+.action-btn:hover {
+  background: var(--border);
+  transform: translateY(-2px);
+}
+
+.action-btn.edit:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.action-btn.delete:hover {
+  border-color: #ef4444;
 }
 
 .action-btn {

@@ -32,9 +32,9 @@ const RightPanel = ({ task, onClose, onSave, onResetForm, editingId, title, setT
 
         <div className="form-row">
           <div className="form-group">
-            <label>Due Date</label>
+            <label>Due Date & Time</label>
             <input
-              type="date"
+              type="datetime-local"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
             />

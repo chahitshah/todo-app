@@ -118,6 +118,8 @@ Additionally, UI inspiration was taken from modern design references (such as Pi
 
 > "Why is my API call not working and how to debug Axios and Express errors?"
 
+---
+
 ### 🔹 11. Productivity Features (Task 5)
 
 > "How to implement browser notifications for task reminders in React? I want to notify the user if a task is due soon."
@@ -125,6 +127,8 @@ Additionally, UI inspiration was taken from modern design references (such as Pi
 > "How to implement backend pagination with Mongoose and a 'Load More' button in the React frontend?"
 
 > "How to sort tasks by both priority (High/Medium/Low) and due date dynamically in the UI?"
+
+---
 
 ### 🔹 12. Security & Middleware Update (New)
 
@@ -134,7 +138,18 @@ Additionally, UI inspiration was taken from modern design references (such as Pi
 
 ---
 
+### 🔹 13. UI Layout & Notification Debugging
+
+> "My sidebar form is cutting off the priority dropdown. How to restructure the CSS for a vertical flex layout to ensure all fields are visible?"
+
+> "The push notifications aren't triggering on time. How to implement a `useEffect` interval to check tasks every 15 seconds against the local system time and handle timezone offsets correctly?"
+
+---
+
 ## 🧾 Loom Video Script & Presentation Outline (Task 6)
+
+The UI design was inspired by modern SaaS dashboards and minimal productivity applications.
+
 The UI design was inspired by modern SaaS dashboards and minimal productivity applications.
 
 Focus areas:

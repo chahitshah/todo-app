@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import TaskCard from "../components/TaskCard";
@@ -82,8 +82,11 @@ function Dashboard() {
     fetchTasks();
   }, [navigate, page]);
 
+  const notifiedIds = useRef(new Set());
+
   // Reminder Logic
   useEffect(() => {
+    if (!notificationsEnabled) return;
     const checkReminders = () => {
       if (Notification.permission !== "granted") return;
 
@@ -93,22 +96,26 @@ function Dashboard() {
           const due = new Date(task.dueDate);
           const diffInMinutes = (due - now) / (1000 * 60);
 
-          // Notify if task is due within the next 30 minutes and hasn't been notified yet (simple check)
-          if (diffInMinutes > 0 && diffInMinutes <= 30 && !task.notified) {
-            new Notification("Task Reminder", {
-              body: `Your task "${task.title}" is due soon!`,
-              icon: "/logo192.png" // Placeholder
-            });
-            task.notified = true; // Temporary flag for current session
+          // Notify if task is due in next 30 mins OR overdue by 1 min
+          if (diffInMinutes <= 30 && diffInMinutes >= -1 && !notifiedIds.current.has(task._id)) {
+            try {
+              new Notification("Task Reminder", {
+                body: diffInMinutes < 0 ? `"${task.title}" is due now!` : `"${task.title}" is due soon!`,
+                icon: "https://cdn-icons-png.flaticon.com/512/2098/2098402.png" 
+              });
+              notifiedIds.current.add(task._id);
+            } catch (err) {
+              console.error("Notif failed", err);
+            }
           }
         }
       });
     };
 
-    const interval = setInterval(checkReminders, 60000); // Check every minute
+    const interval = setInterval(checkReminders, 15000); // Check every 15s for precision
+    checkReminders();
     return () => clearInterval(interval);
-  }, [tasks]);
-
+  }, [tasks, notificationsEnabled]);
 
   const addTask = async () => {
     if (!title) return;
@@ -188,9 +195,20 @@ function Dashboard() {
     setEditingId(t._id);
     setTitle(t.title);
     setDescription(t.description || "");
-    setDueDate(t.dueDate ? t.dueDate.split('T')[0] : "");
+
+    if (t.dueDate) {
+      const dateObj = new Date(t.dueDate);
+      const localISO = new Date(dateObj.getTime() - dateObj.getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 16);
+      setDueDate(localISO);
+    } else {
+      setDueDate("");
+    }
+
     setPriority(t.priority || "Medium");
   };
+
 
   const saveEdit = async () => {
     try {
@@ -211,9 +229,9 @@ function Dashboard() {
 
   };
 
-  const getGroupedTasks = () => {
-    const today = new Date().toISOString().split('T')[0];
-    const groups = {
+  const groups = useMemo(() => {
+    const todayStr = new Date().toLocaleDateString('en-CA'); // Gets YYYY-MM-DD in local time
+    const res = {
       today: [],
       upcoming: [],
       completed: []
@@ -221,18 +239,18 @@ function Dashboard() {
 
     tasks.forEach(t => {
       if (t.completed) {
-        groups.completed.push(t);
-      } else if (t.dueDate && t.dueDate.split('T')[0] === today) {
-        groups.today.push(t);
+        res.completed.push(t);
+      } else if (t.dueDate && t.dueDate.split('T')[0] === todayStr) {
+        res.today.push(t);
       } else {
-        groups.upcoming.push(t);
+        res.upcoming.push(t);
       }
     });
 
     const priorityMap = { High: 3, Medium: 2, Low: 1 };
 
-    Object.keys(groups).forEach(key => {
-      groups[key].sort((a, b) => {
+    Object.keys(res).forEach(key => {
+      res[key].sort((a, b) => {
         if (sortBy === "Date") {
           return new Date(a.dueDate || "9999-12-31") - new Date(b.dueDate || "9999-12-31");
         } else if (sortBy === "Priority") {
@@ -244,11 +262,8 @@ function Dashboard() {
       });
     });
 
-
-    return groups;
-  };
-
-  const groups = getGroupedTasks();
+    return res;
+  }, [tasks, sortBy]);
 
   return (
     <div className="dashboard-content-layout">
@@ -276,14 +291,15 @@ function Dashboard() {
           </div>
           <div className="form-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
             <div className="input-with-label">
-              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '4px' }}>DUE DATE</label>
+              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '4px' }}>DUE DATE & TIME</label>
               <input
-                type="date"
+                type="datetime-local"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
                 className="form-input"
               />
             </div>
+
             <div className="input-with-label">
               <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '4px' }}>PRIORITY</label>
               <select
@@ -316,8 +332,8 @@ function Dashboard() {
         {/* Global Sorting Controls */}
         <div className="sorting-controls animate-fade-in" style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '1.5rem', gap: '12px' }}>
           <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>SORT BY:</span>
-          <select 
-            value={sortBy} 
+          <select
+            value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
             className="form-input"
             style={{ width: 'auto', padding: '4px 12px', fontSize: '0.85rem', cursor: 'pointer', background: 'var(--card)' }}
@@ -390,19 +406,28 @@ function Dashboard() {
           </div>
         )}
 
-        <div className="notification-settings card glass" style={{ marginTop: '2rem', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className="notification-settings card glass" style={{ marginTop: '2rem', padding: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
-            <h4 style={{ margin: 0 }}>Push Notifications</h4>
-            <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>Get reminded of upcoming deadlines.</p>
+            <h4 style={{ margin: '0 0 4px 0', fontSize: '1.1rem' }}>Smart Reminders</h4>
+            <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>Get notified 30 minutes before your tasks are due.</p>
           </div>
-          <button 
-            className={`btn-${notificationsEnabled ? 'secondary' : 'primary'}`} 
-            onClick={requestNotificationPermission}
-            disabled={notificationsEnabled}
-            style={{ padding: '8px 16px', fontSize: '0.85rem' }}
-          >
-            {notificationsEnabled ? "✓ Enabled" : "Enable Reminders"}
-          </button>
+          {notificationsEnabled ? (
+            <button
+              className="btn-secondary"
+              onClick={() => setNotificationsEnabled(false)}
+              style={{ padding: '8px 16px', fontSize: '0.85rem' }}
+            >
+              Disable Reminders
+            </button>
+          ) : (
+            <button
+              className="btn-primary"
+              onClick={requestNotificationPermission}
+              style={{ padding: '8px 16px', fontSize: '0.85rem' }}
+            >
+              Enable Reminders
+            </button>
+          )}
         </div>
 
 

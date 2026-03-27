@@ -8,10 +8,12 @@ A full-stack task management application built with React, Vite, Express, and Mo
 - Personal dashboard for creating, editing, completing, and deleting tasks
 - Task organization by today, upcoming, and completed items
 - Due date and priority support
-- **Task Reminders:** Real-time browser notifications for upcoming deadlines
+- **Task Reminders:** Real-time browser notifications for upcoming deadlines with a smart Enable/Disable toggle
 - **Pagination:** Efficient "Load More" system to handle large sets of tasks
 - **Advanced Sorting:** Filter and sort by priority, due date, and completion status
+- **Overdue Highlighting:** Immediate visual feedback with red highlighting for tasks past their deadline
 - **Modern Security:** JWT-based user authentication with protected backend routes
+- **Premium UI:** Glassmorphism-inspired design with a responsive, no-cutoff sidebar layout
 - AI-generated daily achievement summaries from completed tasks
 - Summary history page to review past productivity insights
 - Light and dark theme toggle

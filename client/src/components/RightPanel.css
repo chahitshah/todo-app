@@ -1,5 +1,5 @@
 .right-panel {
-  width: 320px;
+  width: 360px;
   height: 100vh;
   position: sticky;
   top: 0;
@@ -41,13 +41,13 @@
 }
 
 .form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .panel-actions {
-  margin-top: auto;
+  margin-top: 2rem;
   display: flex;
   flex-direction: column;
   gap: 12px;

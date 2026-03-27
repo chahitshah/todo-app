@@ -20,15 +20,23 @@ const TaskCard = ({ task, onToggle, onDelete, onEdit }) => {
           </div>
           {task.description && <p className="task-description">{task.description}</p>}
           <div className="task-meta">
-            {task.dueDate && <span className="task-date">📅 {new Date(task.dueDate).toLocaleDateString()}</span>}
+            {task.dueDate && (
+              <span className={`task-date ${!task.completed && new Date(task.dueDate) < new Date() ? "overdue" : ""}`}>
+                📅 {new Date(task.dueDate).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
+                {!task.completed && new Date(task.dueDate) < new Date() && " (Overdue)"}
+              </span>
+            )}
             <span className="task-category">Personal</span>
           </div>
         </div>
       </div>
 
       <div className="task-actions">
+        <button className="action-btn edit" onClick={() => onEdit(task)} title="Edit task">
+          Edit
+        </button>
         <button className="action-btn delete" onClick={() => onDelete(task._id)} title="Delete task">
-          🗑️
+          Delete
         </button>
       </div>
     </div>
