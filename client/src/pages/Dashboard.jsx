@@ -15,6 +15,11 @@ function Dashboard() {
   // Editing State
   const [editingId, setEditingId] = useState(null);
 
+  // AI Summary State
+  const [showSummaryModal, setShowSummaryModal] = useState(false);
+  const [aiSummary, setAiSummary] = useState("");
+  const [loadingSummary, setLoadingSummary] = useState(false);
+
   useEffect(() => {
     const userId = localStorage.getItem("userId");
     if (!userId) {
@@ -48,6 +53,20 @@ function Dashboard() {
       resetForm();
     } catch (err) {
       console.error("Add Task Error:", err);
+    }
+  };
+
+  const generateSummary = async () => {
+    setLoadingSummary(true);
+    const userId = localStorage.getItem("userId");
+    try {
+      const res = await axios.post("http://localhost:5000/api/summary/generate", { userId });
+      setAiSummary(res.data.text);
+      setShowSummaryModal(true);
+    } catch (err) {
+      alert(err.response?.data?.error || "Failed to generate summary.");
+    } finally {
+      setLoadingSummary(false);
     }
   };
 
@@ -214,7 +233,27 @@ function Dashboard() {
           <ul className="completed-list">{groups.completed.map(renderTaskCard)}</ul>
         </section>
       </div>
-      
+
+      <div className="summary-section">
+        <button 
+          className="generate-summary-btn" 
+          onClick={generateSummary}
+          disabled={loadingSummary}
+        >
+          {loadingSummary ? "Generating AI Summary..." : "✨ Generate Daily Summary"}
+        </button>
+      </div>
+
+      {showSummaryModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <button className="close-modal" onClick={() => setShowSummaryModal(false)}>×</button>
+            <h3>Daily Achievements Summary</h3>
+            <p className="summary-text">{aiSummary}</p>
+            <button onClick={() => setShowSummaryModal(false)}>Great, thanks!</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

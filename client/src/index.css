@@ -135,12 +135,96 @@ a:hover {
   text-decoration: underline;
 }
 
-/* Dashboard Styles */
-.dashboard-container {
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 1.5rem;
+  padding: 2.5rem;
+  max-width: 600px;
+  width: 90%;
+  position: relative;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.modal-content h3 {
+  margin-bottom: 1.5rem;
+  color: var(--primary);
+}
+
+.summary-text {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--text);
+  white-space: pre-wrap;
+  margin-bottom: 2rem;
+}
+
+.close-modal {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+/* History Page */
+.history-container {
   max-width: 900px;
   width: 95%;
   margin: 2rem auto;
   padding: 0 1rem;
+}
+
+.history-list {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.history-card {
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+.history-date {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--primary);
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.generate-summary-btn {
+  background: linear-gradient(to right, #6366f1, #06b6d4);
+  color: white;
+  margin-top: 1rem;
+  font-weight: 600;
+  border: none;
+}
+
+.generate-summary-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .task-form {

@@ -16,6 +16,7 @@ function Navbar() {
       {userId && (
         <div className="nav-links">
           <Link to="/dashboard">Dashboard</Link>
+          <Link to="/history">History</Link>
           <button className="logout-btn" onClick={handleLogout}>Logout</button>
         </div>
       )}

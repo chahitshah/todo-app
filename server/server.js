@@ -20,8 +20,14 @@ app.use((req, res, next) => {
 });
 
 // routes
-app.use("/api/auth", require("./routes/auth"));
-app.use("/api/task", require("./routes/task"));
+const authRoutes = require("./routes/auth");
+const taskRoutes = require("./routes/task");
+const summaryRoutes = require("./routes/summary");
+
+app.use("/api/auth", authRoutes);
+app.use("/api/task", taskRoutes);
+app.use("/api/tasks", taskRoutes);
+app.use("/api/summary", summaryRoutes);
 
 // global error handler
 app.use((err, req, res, next) => {
