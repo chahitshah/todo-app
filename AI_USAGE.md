@@ -118,10 +118,23 @@ Additionally, UI inspiration was taken from modern design references (such as Pi
 
 > "Why is my API call not working and how to debug Axios and Express errors?"
 
+### 🔹 11. Productivity Features (Task 5)
+
+> "How to implement browser notifications for task reminders in React? I want to notify the user if a task is due soon."
+
+> "How to implement backend pagination with Mongoose and a 'Load More' button in the React frontend?"
+
+> "How to sort tasks by both priority (High/Medium/Low) and due date dynamically in the UI?"
+
+### 🔹 12. Security & Middleware Update (New)
+
+> "How to implement a professional JWT verification middleware for Express and apply it to protect my Task and Summary routes?"
+
+> "How to update Axios in React to consistently pass the security token in the headers for GET, POST, PUT, and DELETE requests?"
+
 ---
 
-## 🎨 UI Design Approach
-
+## 🧾 Loom Video Script & Presentation Outline (Task 6)
 The UI design was inspired by modern SaaS dashboards and minimal productivity applications.
 
 Focus areas:

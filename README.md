@@ -8,9 +8,14 @@ A full-stack task management application built with React, Vite, Express, and Mo
 - Personal dashboard for creating, editing, completing, and deleting tasks
 - Task organization by today, upcoming, and completed items
 - Due date and priority support
+- **Task Reminders:** Real-time browser notifications for upcoming deadlines
+- **Pagination:** Efficient "Load More" system to handle large sets of tasks
+- **Advanced Sorting:** Filter and sort by priority, due date, and completion status
+- **Modern Security:** JWT-based user authentication with protected backend routes
 - AI-generated daily achievement summaries from completed tasks
 - Summary history page to review past productivity insights
 - Light and dark theme toggle
+
 
 ## Tech Stack
 
@@ -50,7 +55,7 @@ todo-app/
 |   |-- server.js
 |   `-- package.json
 `-- README.md
-```
+``` AI_USAGE.md
 
 ## Main User Flow
 
@@ -136,7 +141,7 @@ http://localhost:5173
 ### Task Routes
 
 - `POST /api/task/add` - Create a task
-- `GET /api/task/:userId` - Fetch all tasks for a user
+- `GET /api/task/:userId?page=1&limit=20` - Fetch tasks for a user with pagination support
 - `PUT /api/task/:id` - Update a task or completion status
 - `DELETE /api/task/:id` - Delete a task
 
@@ -167,11 +172,12 @@ http://localhost:5173
 
 ## Possible Improvements
 
-- Add protected backend routes using JWT middleware
 - Add input validation and better error messages
 - Add task categories to the backend schema
 - Add testing for frontend and backend
+- Add Docker support for easy deployment (Future Scope)
 - Add deployment configuration for production
+
 
 ## Author
 

@@ -1,9 +1,18 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Navbar.css";
 
 function Navbar({ theme, toggleTheme, toggleSidebar }) {
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000); // Update every minute
+    return () => clearInterval(timer);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -18,6 +27,14 @@ function Navbar({ theme, toggleTheme, toggleSidebar }) {
     if (!stored || stored === "undefined" || stored === "null") return "Traveler";
     return stored;
   };
+
+  const getGreeting = () => {
+    const hour = currentTime.getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
+    return "Good evening";
+  };
+
   const username = getName();
 
   return (
@@ -28,8 +45,14 @@ function Navbar({ theme, toggleTheme, toggleSidebar }) {
             ☰
           </button>
           <div className="nav-header">
-            <span className="greeting">Good day, {username}</span>
-            <span className="date">{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}</span>
+            <span className="greeting">{getGreeting()}, {username}</span>
+            <span className="date">
+              {currentTime.toLocaleDateString(undefined, { 
+                weekday: 'long', 
+                month: 'short', 
+                day: 'numeric' 
+              })}
+            </span>
           </div>
         </div>
 
