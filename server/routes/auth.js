@@ -39,7 +39,7 @@ router.post("/login", async (req, res) => {
 
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
 
-  res.json({ token, userId: user._id });
+  res.json({ token, userId: user._id, name: user.name });
 });
 
 module.exports = router;

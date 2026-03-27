@@ -1,17 +1,28 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
+import TaskCard from "../components/TaskCard";
+import RightPanel from "../components/RightPanel";
+import "./Dashboard.css";
 
 function Dashboard() {
   const navigate = useNavigate();
   const [tasks, setTasks] = useState([]);
-  
+
+  const getName = () => {
+    const stored = localStorage.getItem("username") || localStorage.getItem("name");
+    if (!stored || stored === "undefined" || stored === "null") return "User";
+    return stored;
+  };
+  const username = getName();
+
   // Form State
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [priority, setPriority] = useState("Medium");
-  
+  const [category, setCategory] = useState("Personal");
+
   // Editing State
   const [editingId, setEditingId] = useState(null);
 
@@ -47,10 +58,15 @@ function Dashboard() {
         description,
         dueDate,
         priority,
+        category,
         userId
       });
       setTasks([...tasks, res.data]);
-      resetForm();
+      setTitle("");
+      setDescription("");
+      setDueDate("");
+      setPriority("Medium");
+      setCategory(activeFilter === "Work" ? "Work" : "Personal");
     } catch (err) {
       console.error("Add Task Error:", err);
     }
@@ -81,6 +97,7 @@ function Dashboard() {
   const deleteTask = async (id) => {
     await axios.delete(`http://localhost:5000/api/task/${id}`);
     setTasks(tasks.filter((t) => t._id !== id));
+    if (editingId === id) resetForm();
   };
 
   const toggleComplete = async (id, currentStatus) => {
@@ -136,121 +153,153 @@ function Dashboard() {
 
   const groups = getGroupedTasks();
 
-  const renderTaskCard = (t) => (
-    <li key={t._id} className={`task-card ${t.completed ? "completed" : ""} priority-${t.priority.toLowerCase()}`}>
-      <div className="task-header">
-        <div className="task-main">
-          <input 
-            type="checkbox" 
-            checked={t.completed} 
-            onChange={() => toggleComplete(t._id, t.completed)}
-            className="task-checkbox"
-          />
-          <div className="task-info">
-            <span className="task-title">{t.title}</span>
-            {t.description && <p className="task-desc">{t.description}</p>}
-            <div className="task-meta">
-              {t.dueDate && <span className="task-date">📅 {new Date(t.dueDate).toLocaleDateString()}</span>}
-              <span className={`priority-badge ${t.priority.toLowerCase()}`}>{t.priority}</span>
+  return (
+    <div className="dashboard-content-layout">
+      <div className="dashboard-main-area">
+        {/* Expanded Add Form */}
+        <div className="task-form card glass animate-fade-in" style={{ marginBottom: '2.5rem' }}>
+          <h3 style={{ marginBottom: '1.5rem', fontSize: '1.1rem' }}>Create New Task</h3>
+          <div className="form-group" style={{ marginBottom: '1rem' }}>
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="What needs to be done?"
+              className="form-input"
+              style={{ fontSize: '1.1rem', fontWeight: 500 }}
+            />
+          </div>
+          <div className="form-group" style={{ marginBottom: '1rem' }}>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Add details (optional)"
+              className="form-input"
+              style={{ minHeight: '80px' }}
+            />
+          </div>
+          <div className="form-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+            <div className="input-with-label">
+              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '4px' }}>DUE DATE</label>
+              <input
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                className="form-input"
+              />
+            </div>
+            <div className="input-with-label">
+              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '4px' }}>PRIORITY</label>
+              <select
+                value={priority}
+                onChange={(e) => setPriority(e.target.value)}
+                className="form-input"
+              >
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+              </select>
+            </div>
+            <div className="input-with-label">
+              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '4px' }}>CATEGORY</label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="form-input"
+              >
+                <option value="Personal">Personal</option>
+                <option value="Work">Work</option>
+              </select>
             </div>
           </div>
+          <button className="btn-primary" onClick={addTask} style={{ width: '100%', padding: '12px' }}>
+            Add to My List
+          </button>
         </div>
-        <div className="task-actions">
-          <button className="edit-btn" onClick={() => startEdit(t)}>Edit</button>
-          <button className="delete-btn" onClick={() => deleteTask(t._id)}>Delete</button>
+
+        {/* Task Sections */}
+        <div className="tasks-container">
+          <section className="task-section">
+            <h3 className="section-title">
+              Today's Focus
+              <span className="badge">{groups.today.length}</span>
+            </h3>
+            <div className="task-list">
+              {groups.today.map(t => (
+                <TaskCard
+                  key={t._id}
+                  task={t}
+                  onToggle={toggleComplete}
+                  onDelete={deleteTask}
+                  onEdit={startEdit}
+                />
+              ))}
+              {groups.today.length === 0 && <p className="empty-state">No tasks for today! Enjoy your day.</p>}
+            </div>
+          </section>
+
+          <section className="task-section">
+            <h3 className="section-title">Upcoming <span className="badge">{groups.upcoming.length}</span></h3>
+            <div className="task-list">
+              {groups.upcoming.map(t => (
+                <TaskCard
+                  key={t._id}
+                  task={t}
+                  onToggle={toggleComplete}
+                  onDelete={deleteTask}
+                  onEdit={startEdit}
+                />
+              ))}
+            </div>
+          </section>
+
+          <section className="task-section">
+            <h3 className="section-title">Recently Completed <span className="badge">{groups.completed.length}</span></h3>
+            <div className="task-list">
+              {groups.completed.map(t => (
+                <TaskCard
+                  key={t._id}
+                  task={t}
+                  onToggle={toggleComplete}
+                  onDelete={deleteTask}
+                  onEdit={startEdit}
+                />
+              ))}
+            </div>
+          </section>
+        </div>
+
+        <div className="summary-section card glass" style={{ marginTop: '3rem', padding: '2rem', textAlign: 'center', border: '1px solid var(--accent)', background: 'rgba(59, 130, 246, 0.05)' }}>
+          <h3 style={{ marginBottom: '1rem' }}>Daily Achievement Summary</h3>
+          <p style={{ marginBottom: '1.5rem', fontSize: '0.9rem' }}>Use AI to reflect on your completed tasks and get personalized insights.</p>
+          <button className="btn-primary" onClick={generateSummary} disabled={loadingSummary} style={{ margin: '0 auto' }}>
+            {loadingSummary ? "Analyzing..." : "Generate AI Summary"}
+          </button>
         </div>
       </div>
-    </li>
-  );
 
-  return (
-    <div className="dashboard-container">
-      <h2>Todo Dashboard</h2>
+      <RightPanel
+        editingId={editingId}
+        title={title}
+        setTitle={setTitle}
+        description={description}
+        setDescription={setDescription}
+        dueDate={dueDate}
+        setDueDate={setDueDate}
+        priority={priority}
+        setPriority={setPriority}
+        onSave={saveEdit}
+        onClose={resetForm}
+        onResetForm={resetForm}
+      />
 
-      <div className="task-form card">
-        <h3>{editingId ? "Edit Task" : "Add New Task"}</h3>
-        <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Task Title"
-          className="form-input"
-        />
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Description"
-          className="form-input"
-        />
-        <div className="form-row">
-          <input
-            type="date"
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
-            className="form-input"
-          />
-          <select 
-            value={priority} 
-            onChange={(e) => setPriority(e.target.value)}
-            className="form-input"
-          >
-            <option value="Low">Low Priority</option>
-            <option value="Medium">Medium Priority</option>
-            <option value="High">High Priority</option>
-          </select>
-        </div>
-        <div className="form-buttons">
-          {editingId ? (
-            <>
-              <button onClick={saveEdit}>Save Changes</button>
-              <button className="cancel-btn" onClick={resetForm}>Cancel</button>
-            </>
-          ) : (
-            <button onClick={addTask}>Add Task</button>
-          )}
-        </div>
-      </div>
-
-      <div className="task-sections">
-        <section className="task-section">
-          <div className="section-header">
-            <h3>Today's Focus <span className="badge">{groups.today.length}</span></h3>
-          </div>
-          <ul>{groups.today.map(renderTaskCard)}</ul>
-          {groups.today.length === 0 && <p className="empty-msg">No tasks for today!</p>}
-        </section>
-
-        <section className="task-section">
-          <div className="section-header">
-            <h3>Upcoming <span className="badge">{groups.upcoming.length}</span></h3>
-          </div>
-          <ul>{groups.upcoming.map(renderTaskCard)}</ul>
-        </section>
-
-        <section className="task-section">
-          <div className="section-header">
-            <h3>Completed <span className="badge">{groups.completed.length}</span></h3>
-          </div>
-          <ul className="completed-list">{groups.completed.map(renderTaskCard)}</ul>
-        </section>
-      </div>
-
-      <div className="summary-section">
-        <button 
-          className="generate-summary-btn" 
-          onClick={generateSummary}
-          disabled={loadingSummary}
-        >
-          {loadingSummary ? "Generating AI Summary..." : "✨ Generate Daily Summary"}
-        </button>
-      </div>
-
+      {/* AI Summary Modal */}
       {showSummaryModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
+        <div className="modal-overlay animate-fade-in">
+          <div className="modal-content glass">
             <button className="close-modal" onClick={() => setShowSummaryModal(false)}>×</button>
-            <h3>Daily Achievements Summary</h3>
+            <h3>Your Daily Summary</h3>
             <p className="summary-text">{aiSummary}</p>
-            <button onClick={() => setShowSummaryModal(false)}>Great, thanks!</button>
+            <button className="btn-primary" onClick={() => setShowSummaryModal(false)}>Great, thanks!</button>
           </div>
         </div>
       )}

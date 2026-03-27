@@ -1,0 +1,141 @@
+.task-card {
+  padding: 16px;
+  border-radius: var(--radius-md);
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: var(--transition);
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.task-card:hover {
+  transform: scale(1.01);
+  box-shadow: var(--shadow-lg);
+}
+
+.task-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  flex: 1;
+}
+
+.checkbox-container {
+  display: block;
+  position: relative;
+  cursor: pointer;
+  padding-left: 24px;
+  margin-bottom: 24px;
+}
+
+.checkbox-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 20px;
+  width: 20px;
+  background-color: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  transition: var(--transition);
+}
+
+.checkbox-container:hover input ~ .checkmark {
+  border-color: var(--accent);
+}
+
+.checkbox-container input:checked ~ .checkmark {
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.task-text {
+  flex: 1;
+  cursor: pointer;
+}
+
+.task-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.task-title {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.task-description {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.task-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.task-actions {
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.task-card:hover .task-actions {
+  opacity: 1;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.action-btn:hover {
+  background: var(--border);
+}
+
+.completed .task-title {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+@media (max-width: 640px) {
+  .task-actions {
+    opacity: 1;
+  }
+}

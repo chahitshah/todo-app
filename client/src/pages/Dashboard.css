@@ -1,0 +1,81 @@
+.dashboard-content-layout {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+}
+
+.dashboard-main-area {
+  flex: 1;
+  max-width: 800px;
+}
+
+.quick-add {
+  display: flex;
+  gap: 12px;
+  padding: 12px 16px;
+  margin-bottom: 32px;
+}
+
+.quick-add input {
+  background: transparent;
+  border: none;
+  font-size: 1.1rem;
+  padding: 8px 0;
+}
+
+.quick-add input:focus {
+  box-shadow: none;
+}
+
+.quick-add .btn-primary {
+  padding: 8px 20px;
+  white-space: nowrap;
+}
+
+.tasks-container {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.section-title {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-title .badge {
+  background: var(--border);
+  color: var(--text-muted);
+}
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.empty-state {
+  padding: 32px;
+  text-align: center;
+  background: var(--card);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--border);
+  color: var(--text-muted);
+}
+
+.summary-trigger {
+  margin-top: 48px;
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 1024px) {
+  .dashboard-main-area {
+    max-width: 100%;
+  }
+}
